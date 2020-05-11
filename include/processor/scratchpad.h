@@ -85,7 +85,7 @@ static inline unsigned long __sp_meta_index(struct pcache_meta *pcm)
 static inline struct pcache_meta*
 pa_to_sp_meta(unsigned long address)
 {
-    if (likely(pa_is_sp(address))){
+    if (pa_is_sp(address)){
         unsigned long offset;
 
         offset = (address & PCACHE_LINE_MASK) - sp_phys_start_cacheline;

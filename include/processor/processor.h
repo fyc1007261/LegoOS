@@ -66,6 +66,13 @@ static inline int pcache_range_register(u64 start, u64 size)
 	return 0;
 }
 
+static inline int sp_range_register(u64 start)
+{
+	return 0;
+}
+
+
+
 static inline int
 pcache_handle_fault(struct mm_struct *mm, unsigned long address, unsigned long flags)
 {

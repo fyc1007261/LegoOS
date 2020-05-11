@@ -23,7 +23,7 @@
 #include <processor/distvm.h>
 #include <processor/processor.h>
 #include <processor/replication.h>
-#include <processor/scratchpad.h>
+
 
 #ifdef CONFIG_DEBUG_PCACHE_FLUSH
 #define clflush_debug(fmt, ...)	\

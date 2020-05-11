@@ -145,6 +145,20 @@ int sp_try_to_unmap(struct pcache_meta *pcm)
 		ret = PCACHE_RMAP_SUCCEED;
 	return ret;
 }
+#define MIN_GAP	(128*1024*1024UL)
+#define MAX_GAP	(TASK_SIZE/6*5)
+
+static unsigned long mmap_base(void)
+{
+	unsigned long gap = 0; /* TODO: rlimit */
+
+	if (gap < MIN_GAP)
+		gap = MIN_GAP;
+	else if (gap > MAX_GAP)
+		gap = MAX_GAP;
+
+	return PAGE_ALIGN(TASK_SIZE - gap);
+}
 
 static int sp_try_to_unmap_one(struct pcache_meta *pcm,
                     struct pcache_ramp *rmap, void *arg)

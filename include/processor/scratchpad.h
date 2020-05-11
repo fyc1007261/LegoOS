@@ -10,38 +10,39 @@
 #include <uapi/processor/pcache.h>
 
 
-extern sp_registered_start;
-extern sp_registered_size;
+extern u64 sp_registered_start;
+extern u64 sp_registered_size;
 
-extern sp_llc_size;
+extern u64 sp_llc_size;
 
-extern sp_nr_cachelines;
-extern sp_nr_cachesets;
+extern u64 sp_nr_cachelines;
+extern u64 sp_nr_cachesets;
 
-extern sp_nr_pages_cacheline;
-extern sp_nr_pages_metadata;
+extern u64 sp_nr_pages_cacheline;
+extern u64 sp_nr_pages_metadata;
 
 
 
-extern sp_phys_start_cacheline;
-extern sp_phys_start_metadata;
-extern sp_virt_start_cacheline;
+extern u64 sp_phys_start_cacheline;
+extern u64 sp_phys_start_metadata;
+extern u64 sp_virt_start_cacheline;
 
-extern sp_cacheline_mask;
-extern sp_set_mask;
-extern sp_tag_mask;
+extern u64 sp_cacheline_mask;
+extern u64 sp_set_mask;
+extern u64 sp_tag_mask;
 
-extern sp_nr_bits_cacheline ;
-extern sp_nr_bits_tag;
+extern u64 sp_nr_bits_cacheline ;
+extern u64 sp_nr_bits_tag;
 
 extern struct pcache_meta *sp_meta_map;
+extern struct pcache_set *sp_set_map;
 
 #define sp_for_each_way(pcm,nr)                 \
     for (nr = 0, pcm = sp_meta_map; nr<sp_nr_cachelines;    \
     nr++, pcm++)
 
 #define sp_for_each_set(pset,nr)        \
-    for (nr=0,pset = pcache_set_map; nr<sp_nr_cachesets;     \
+    for (nr=0,pset = sp_set_map; nr<sp_nr_cachesets;     \
         nr++, pset++)
 
 

@@ -7,6 +7,7 @@ obj-y += task.o
 obj-y += handle_fork.o
 obj-y += handle_execve.o
 obj-y += handle_mmap.o
+obj-y += handle_sp.o
 obj-y += handle_file.o
 obj-y += handle_checkpoint.o
 obj-y += file_ops.o

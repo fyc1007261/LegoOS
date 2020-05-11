@@ -23,3 +23,5 @@ obj-$(CONFIG_STRACE) += strace/
 #
 obj-y += pcache/
 obj-$(CONFIG_PCACHE_ZEROFILL_NOTIFY_MEMORY) += zerofill_notify.o
+
+obj-y += scratchpad/

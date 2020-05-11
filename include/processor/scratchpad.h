@@ -50,7 +50,7 @@ static inline void *sp_meta_to_pa(struct pcache_meta *pcm){
     unsigned long offset = pcm-sp_meta_map;
 
     BUG_ON(offset >= sp_nr_cachelines);
-    return (void *)(sp_phys_start_cacheline + offset * PCACHE_LINES_SIZE);
+    return (void *)(sp_phys_start_cacheline + offset * PCACHE_LINE_SIZE);
 }
 
 static inline unsigned long sp_meta_to_pfn(struct pcache_meta *pcm)

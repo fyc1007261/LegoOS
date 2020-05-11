@@ -24,6 +24,7 @@ void __init kick_off_user(void);
 void __init processor_manager_early_init(void);
 void __init processor_manager_init(void);
 int __init pcache_range_register(u64 start, u64 size);
+int __init sp_range_register(u64 start, u64 size);
 
 /* Callback for fork() to initialize processor_manager data */
 void fork_processor_data(struct task_struct *, struct task_struct *, unsigned long clone_flags);

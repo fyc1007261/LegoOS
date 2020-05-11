@@ -1,3 +1,5 @@
+#ifndef _LEGO_PROCESSOR_SCRATCHPAD_H_
+#define _LEGO_PROCESSOR_SCRATCHPAD_H_
 
 #include <lego/list.h>
 #include <lego/const.h>

@@ -119,7 +119,7 @@ pte_to_sp_meta(pte_t pte)
     return pa_to_sp_meta(pa);
 }
 
-//unsigned long virt_sp_alloc(unsigned long len);
+unsigned long virt_sp_alloc(unsigned long len);
 int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address, 
             unsigned long old_virt_address, unsigned long len);
 int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_addr, unsigned long len);

@@ -31,7 +31,7 @@ asmlinkage long sys_sp_unpin(unsigned old_addr, unsigned long new_addr, unsigned
     if(ret<0){
         return -1;
     }
-    ret = virt_sp_free(new_addr,len)
+    ret = virt_sp_free(new_addr,len);
     if(ret<0){
         return -1;
     }

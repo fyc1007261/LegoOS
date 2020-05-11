@@ -107,3 +107,10 @@ pte_to_sp_meta(pte_t pte)
     unsigned long pa = pte_val(pte) & PTE_PFN_MASK;
     return pa_to_sp_meta(pa);
 }
+
+unsigend long virt_sp_alloc(unsigned long len);
+int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address, 
+            unsigned long old_virt_address, unsigned long len);
+int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_addr, unsigned long len);
+unsigend long virt_sp_free(unsigned long addr, unsigned long len);
+

@@ -1,6 +1,15 @@
 
 #include <lego/mm.h>
+#include <lego/slab.h>
+#include <lego/log2.h>
+#include <lego/kernel.h>
+#include <lego/pgfault.h>
 #include <lego/syscalls.h>
+#include <lego/memblock.h>
+
+#include <processor/pcache.h>
+#include <processor/processor.h>
+#include <processor/scratchpad.h>
 
 asmlinkage long sys_sp_pin(unsigned addr,unsigned long len) {
     /* alloc the virtual memory from m component side */

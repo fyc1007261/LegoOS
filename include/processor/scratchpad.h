@@ -81,6 +81,13 @@ static inline unsigned long __sp_meta_index(struct pcache_meta *pcm)
 }
 
 
+static inline bool pa_is_sp(unsigned long address)
+{
+    if (likely(address >= sp_phys_start_cacheline &&
+            address < sp_phys_start_metadata))
+            return true;
+    return false;
+}
 
 static inline struct pcache_meta*
 pa_to_sp_meta(unsigned long address)
@@ -99,12 +106,4 @@ pte_to_sp_meta(pte_t pte)
 {
     unsigned long pa = pte_val(pte) & PTE_PFN_MASK;
     return pa_to_sp_meta(pa);
-}
-
-static inline bool pa_is_sp(unsigned long address)
-{
-    if (likely(address >= sp_phys_start_cacheline &&
-            address < sp_phys_start_metadata))
-            return true;
-    return false;
 }

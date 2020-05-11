@@ -80,12 +80,7 @@ static inline unsigned long __sp_meta_index(struct pcache_meta *pcm)
 	return offset;
 }
 
-static inline __must_check struct pcache_meta *
-pte_to_sp_meta(pte_t pte)
-{
-    unsigned long pa = pte_val(pte) & PTE_PFN_MASK;
-    return pa_to_sp_meta(pa);
-}
+
 
 static inline struct pcache_meta*
 pa_to_sp_meta(unsigned long address)
@@ -98,6 +93,12 @@ pa_to_sp_meta(unsigned long address)
         return sp_meta_map + offset;
     }
     return NULL;
+}
+static inline __must_check struct pcache_meta *
+pte_to_sp_meta(pte_t pte)
+{
+    unsigned long pa = pte_val(pte) & PTE_PFN_MASK;
+    return pa_to_sp_meta(pa);
 }
 
 static inline bool pa_is_sp(unsigned long address)

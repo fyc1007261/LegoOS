@@ -125,3 +125,4 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
 int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_addr, unsigned long len);
 unsigned long virt_sp_free(unsigned long addr, unsigned long len);
 
+#endif

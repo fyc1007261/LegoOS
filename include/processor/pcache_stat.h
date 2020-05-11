@@ -175,6 +175,21 @@ static inline long pcache_used(void)
 {
 	return atomic_long_read(&nr_used_cachelines);
 }
+/* cxy: sp related */
+static inline void inc_sp_used(void)
+{
+	atomic_long_inc(&sp_nr_used_cachelines);
+}
+
+static inline void dec_sp_used(void)
+{
+	atomic_long_dec(&sp_nr_used_cachelines);
+}
+
+static inline long sp_used(void)
+{
+	return atomic_long_read(&sp_nr_used_cachelines);
+}
 
 #else
 static inline void inc_pcache_event(enum pcache_event_item i) { }
@@ -189,6 +204,10 @@ static inline void dec_pset_event(struct pcache_set *pset,
 static inline void inc_pcache_used(void) { }
 static inline void dec_pcache_used(void) { }
 static inline long pcache_used(void) { return 0; }
+/* cxy: sp related */
+static inline void inc_sp_used(void) { }
+static inline void dec_sp_used(void) { }
+static inline long sp_used(void) {return 0; }
 #endif /* CONFIG_COUNTER_PCACHE */
 
 #ifdef CONFIG_COMP_PROCESSOR

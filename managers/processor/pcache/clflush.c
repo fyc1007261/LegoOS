@@ -23,6 +23,7 @@
 #include <processor/distvm.h>
 #include <processor/processor.h>
 #include <processor/replication.h>
+#include <processor/scratchpad.h>
 
 #ifdef CONFIG_DEBUG_PCACHE_FLUSH
 #define clflush_debug(fmt, ...)	\
@@ -123,6 +124,48 @@ static int __pcache_flush_one(struct pcache_meta *pcm,
 	(*nr_flushed)++;
 	return PCACHE_RMAP_AGAIN;
 }
+
+static int __sp_flush_one(struct pcache_meta *pcm,
+			      struct pcache_rmap *rmap, void *arg)
+{
+	int *nr_flushed = arg;
+	/* only old virt can be flushed back */
+    if (rmap->address<=mmap_base()-(1UL<<30)*128-PAGE_SIZE){
+		clflush_one(rmap->owner_process, rmap->address,
+		    sp_meta_to_kva(pcm));
+	}
+	(*nr_flushed)++;
+	return PCACHE_RMAP_AGAIN;
+}
+
+int sp_flush_one(struct pcache_meta *pcm)
+{
+	int nr_flushed = 0;
+	struct rmap_walk_control rwc = {
+		.arg = &nr_flushed,
+		.rmap_one = __sp_flush_one,
+	};
+
+	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
+	PCACHE_BUG_ON_PCM(PcacheWriteback(pcm), pcm);
+
+	/*
+	 * XXX:
+	 * Currently only the eviction will call flush, later we may
+	 * add other things such as process exit, chkpoint etc.
+	 * 
+	 * So, for now add this check to catch bugs.
+	 */
+	PCACHE_BUG_ON_PCM(!PcacheReclaim(pcm), pcm);
+
+	SetPcacheWriteback(pcm);
+	rmap_walk(pcm, &rwc);
+	ClearPcacheWriteback(pcm);
+
+	return 0;
+}
+
+
 
 /**
  * pcache_flush_one

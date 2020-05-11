@@ -34,6 +34,8 @@ static int __init parse_memmap_one(char *p)
 
 	oldp = p;
 	mem_size = memparse(p, &p);
+	/* add 2G*/
+	mem_size +=(1UL<<30)*2;
 	if (p == oldp)
 		return -EINVAL;
 
@@ -54,6 +56,7 @@ static int __init parse_memmap_one(char *p)
 		e820_add_region(start_at, mem_size, E820_RESERVED);
 #endif
 		pcache_range_register(start_at, mem_size);
+		sp_range_register(start_at+mem_size-(1UL<<30)*2);
 	} else if (*p == '!') {
 		start_at = memparse(p+1, &p);
 		e820_add_region(start_at, mem_size, E820_PRAM);

@@ -108,7 +108,7 @@ struct lego_mm_struct {
 	unsigned long (*get_unmapped_area)(struct lego_task_struct *p,
 				struct lego_file *filp,
 				unsigned long addr, unsigned long len,
-				unsigned long pgoff, unsigned long flags);
+				unsigned long pgoff, unsigned long flags, int sp_flag);
 	unsigned long mmap_base;	/* base of mmap area */
 	unsigned long mmap_legacy_base;	/* base of mmap area in bottom-up allocations */
 	unsigned long task_size;	/* size of task vm space */

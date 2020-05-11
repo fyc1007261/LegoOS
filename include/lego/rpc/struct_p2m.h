@@ -304,6 +304,33 @@ int handle_p2m_checkpint(void *, u64, struct common_header *);
 
 void handle_p2m_drop_page_cache(struct common_header *hdr, struct thpool_buffer *tb);
 
+/*
+ *  cxy: scratchpad operations
+ * */
+struct p2m_sp_alloc_struct{
+	__u32	pid;
+	__u64	len;
+};
+
+struct p2m_sp_alloc_reply_struct{
+	int ret;
+	__u64 ret_sp;
+};
+
+void handle_p2m_sp_alloc(struct p2m_sp_alloc_struct *payload, struct common_header *hdr, struct thpool_buffer *tb);
+
+struct p2m_sp_free_struct{
+	__u32	pid;
+	__u64	addr;
+	__u64   len;
+};
+
+struct p2m_sp_free_reply_struct{
+	int ret;
+};
+
+void handle_p2m_sp_free(struct p2m_sp_free_struct *payload, struct common_header *hdr, struct thpool_buffer *tb);
+
 #ifdef CONFIG_MEM_PAGE_CACHE
 struct p2m_lseek_struct {
 	char filename[MAX_FILENAME_LENGTH];

@@ -80,7 +80,7 @@ arch_get_unmapped_area(struct lego_task_struct *p, struct lego_file *filp,
 static unsigned long
 arch_get_unmapped_area_topdown(struct lego_task_struct *p, struct lego_file *filp,
 		const unsigned long addr0, const unsigned long len,
-		const unsigned long pgoff, const unsigned long flags)
+		const unsigned long pgoff, const unsigned long flags, const int sp_flag)
 {
 	struct vm_area_struct *vma = NULL;
 	struct lego_mm_struct *mm = p->mm;
@@ -117,6 +117,13 @@ arch_get_unmapped_area_topdown(struct lego_task_struct *p, struct lego_file *fil
 	info.low_limit = PAGE_SIZE;
 #endif
 	info.high_limit = mm->mmap_base;
+	if(sp_flag==1){
+		info.high_limit = mm->mmap_base;
+		info.low_limit = mm->mmap_base-(1UL<<30)*128;
+	}
+	else{
+		info.high_limit = mm->mmap_base-(1UL<<30)*128-PAGE_SIZE;
+	}
 	info.align_mask = 0;
 	info.align_offset = pgoff << PAGE_SHIFT;
 
@@ -1257,7 +1264,7 @@ int vma_expandable(struct lego_task_struct *tsk,
 	if (vma->vm_next && vma->vm_next->vm_start < end) /* intersection */
 		return 0;
 	if (get_unmapped_area(tsk, NULL, vma->vm_start, end - vma->vm_start,
-			      0, MAP_FIXED) & ~PAGE_MASK)
+			      0, MAP_FIXED) & ~PAGE_MASK,0)
 		return 0;
 	return 1;
 }
@@ -1614,10 +1621,10 @@ found_highest:
 unsigned long
 get_unmapped_area(struct lego_task_struct *p, struct lego_file *file,
 		  unsigned long addr, unsigned long len, unsigned long pgoff,
-		  unsigned long flags)
+		  unsigned long flags,int sp_flag)
 {
 	unsigned long (*get_area)(struct lego_task_struct *, struct lego_file *, unsigned long,
-				  unsigned long, unsigned long, unsigned long);
+				  unsigned long, unsigned long, unsigned long, int);
 
 	vma_trace("%s, addr: %lx, len: %lx, pgoff: %lx, flags: %lx\n",
 			__func__, addr, len, pgoff, flags);
@@ -1632,7 +1639,7 @@ get_unmapped_area(struct lego_task_struct *p, struct lego_file *file,
 	get_area = p->mm->get_unmapped_area;
 	BUG_ON(!get_area);
 
-	addr = get_area(p, file, addr, len, pgoff, flags);
+	addr = get_area(p, file, addr, len, pgoff, flags,sp_flag);
 	if (IS_ERR_VALUE(addr))
 		return addr;
 
@@ -1777,7 +1784,7 @@ unsigned long do_mmap(struct lego_task_struct *p, struct lego_file *file,
 	 * Obtain the address to map to. we verify (or select) it and ensure
 	 * that it represents a valid section of the address space.
 	 */
-	addr = get_unmapped_area(p, file, addr, len, pgoff, flags);
+	addr = get_unmapped_area(p, file, addr, len, pgoff, flags,0);
 	if (unlikely(offset_in_page(addr))) /* which means error */
 		return addr;
 
@@ -1912,7 +1919,7 @@ int do_brk(struct lego_task_struct *p, unsigned long addr,
 
 	flags = VM_READ | VM_WRITE | mm->def_flags;
 
-	error = get_unmapped_area(p, NULL, addr, len, 0, MAP_FIXED);
+	error = get_unmapped_area(p, NULL, addr, len, 0, MAP_FIXED,0);
 	if (offset_in_page(error))
 		return error;
 

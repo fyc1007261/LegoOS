@@ -199,6 +199,16 @@ static void thpool_worker_handler(struct thpool_worker *worker,
 	case P2M_DROP_CACHE:
 		handle_p2m_drop_page_cache(hdr, buffer);
 		break;
+/* cxy: scratch pad */
+    case P2M_SP_ALLOC:
+	    inc_mm_stat(HANDLE_P2M_SP_ALLOC);
+	    handle_p2m_sp_alloc(payload, hdr, buffer);
+		break;
+	case P2M_SP_FREE:
+	    inc_mm_stat(HANDLE_P2M_SP_FREE);
+	    handle_p2m_sp_free(payload, hdr, buffer);
+		break;
+
 
 #ifdef CONFIG_MEM_PAGE_CACHE
 	case P2M_LSEEK:

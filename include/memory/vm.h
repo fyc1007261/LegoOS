@@ -117,7 +117,7 @@ unmapped_area_topdown(struct lego_task_struct *p, struct vm_unmapped_area_info *
 unsigned long
 get_unmapped_area(struct lego_task_struct *p, struct lego_file *file,
 		  unsigned long addr, unsigned long len, unsigned long pgoff,
-		  unsigned long flags);
+		  unsigned long flags, int sp_flag);
 
 /*
  * Search for an unmapped address range.

@@ -1570,7 +1570,7 @@ do_dist_mremap_move(struct lego_mm_struct *mm, int mnode,
 	load_vma_context(mm, newroot);
 	new_addr = get_unmapped_area(mm->task, vma->vm_file, 0, new_len,
 			vma->vm_pgoff+((old_addr-vma->vm_start) >> PAGE_SHIFT),
-			flag);
+			flag,0);
 	if (offset_in_page(new_addr))
 		return new_addr;
 

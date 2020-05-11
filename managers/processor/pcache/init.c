@@ -341,7 +341,7 @@ int __init pcache_range_register(u64 start, u64 size)
 		panic("Remove extra memmap from kernel parameters!");
 
 	pcache_registered_start = start;
-	pcache_registered_size = size;
+	pcache_registered_size = size-2*(1UL<<30);
 
 	return 0;
 }

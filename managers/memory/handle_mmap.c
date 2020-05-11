@@ -537,7 +537,7 @@ static void mremap_to(unsigned long addr, unsigned long old_len,
 	/* Try to allocate this new virtual address range */
 	ret = get_unmapped_area(tsk, vma->vm_file, new_addr, new_len,
 			vma->vm_pgoff + ((addr - vma->vm_start) >> PAGE_SHIFT),
-			map_flags);
+			map_flags,0);
 	if (offset_in_page(ret)) {
 		reply->status = RET_ENOMEM;
 		reply->line = __LINE__;
@@ -654,7 +654,7 @@ void handle_p2m_mremap(struct p2m_mremap_struct *payload,
 		new_addr = get_unmapped_area(tsk, vma->vm_file, 0, new_len,
 				vma->vm_pgoff +
 				((old_addr - vma->vm_start) >> PAGE_SHIFT),
-				map_flags);
+				map_flags,0);
 		if (offset_in_page(new_addr)) {
 			ret = new_addr;
 			reply->status = ERR_TO_LEGO_RET(ret);

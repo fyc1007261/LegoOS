@@ -230,6 +230,7 @@ enum rmap_caller {
 	RMAP_COW,
 	RMAP_FORK,
 	RMAP_MREMAP_SLOWPATH,
+	RMAP_SP_COPY,
 
 	NR_RMAP_CALLER,
 };

@@ -13,7 +13,7 @@
 #include <processor/scratchpad.h>
 
 
-unsigend long virt_sp_free(unsigned long addr, unsigned long len)
+unsigned long virt_sp_free(unsigned long addr, unsigned long len)
 {
     struct p2m_sp_free_struct payload;
     struct p2m_sp_free_reply_struct reply;

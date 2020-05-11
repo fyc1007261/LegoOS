@@ -12,7 +12,7 @@
 #include <processor/processor.h>
 #include <processor/scratchpad.h>
 
-unsigend long virt_sp_alloc(unsigned long len){
+unsigned long virt_sp_alloc(unsigned long len){
     struct p2m_sp_alloc_struct payload;
     struct p2m_sp_alloc_reply_struct reply;
     long ret_len, ret_addr;

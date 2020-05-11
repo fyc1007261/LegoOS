@@ -36,6 +36,21 @@ static struct p2m_flush_msg *clflush_msg_array;
 
 DEFINE_PROFILE_POINT(pcache_flush_net)
 
+#define MIN_GAP	(128*1024*1024UL)
+#define MAX_GAP	(TASK_SIZE/6*5)
+
+static unsigned long mmap_base(void)
+{
+	unsigned long gap = 0; /* TODO: rlimit */
+
+	if (gap < MIN_GAP)
+		gap = MIN_GAP;
+	else if (gap > MAX_GAP)
+		gap = MAX_GAP;
+
+	return PAGE_ALIGN(TASK_SIZE - gap);
+}
+
 /*
  * Ultimate flush function.
  * Caller needs to provide all necessary information.

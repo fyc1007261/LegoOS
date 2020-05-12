@@ -127,5 +127,7 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len);
 int sp_add_rmap(struct pcache_meta *pcm, pte_t *page_table, unsigned long address,
             struct mm_struct *owner_mm, struct task_struct *owner_process,
             enum rmap_caller caller);
+void __init alloc_sp_rmap_map(void);
+void __init sp_print_info(void);
 
 #endif

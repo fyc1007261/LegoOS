@@ -651,6 +651,8 @@ int pcache_try_to_unmap_reserve(struct pcache_meta *pcm);
 int pcache_free_reserved_rmap(struct pcache_meta *pcm);
 int sp_flush_one(struct pcache_meta *pcm);
 void free_pcache_rmap(struct pcache_rmap *rmap);
+void report_bad_rmap(struct pcache_meta *pcm, struct pcache_rmap *rmap,
+			    unsigned long address, pte_t *ptep, void *caller);
 
 typedef int (*fill_func_t)(unsigned long, unsigned long, struct pcache_meta *, void *);
 

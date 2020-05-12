@@ -48,7 +48,24 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len)
     }
 
 }
+static __always_inline pmd_t *
+rmap_get_pmd(struct mm_struct *mm, unsigned long address)
+{
+	pgd_t *pgd;
+	pud_t *pud;
+	pmd_t *pmd;
 
+	pgd = pgd_offset(mm, address);
+	BUG_ON(!pgd && !pgd_present(*pgd));
+
+	pud = pud_offset(pgd, address);
+	BUG_ON(!pud && !pud_present(*pud));
+
+	pmd = pmd_offset(pud, address);
+	BUG_ON(!pmd && !pmd_present(*pmd));
+
+	return pmd;
+}
 #define MIN_GAP	(128*1024*1024UL)
 #define MAX_GAP	(TASK_SIZE/6*5)
 

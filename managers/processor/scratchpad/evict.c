@@ -12,6 +12,10 @@
 #include <processor/processor.h>
 #include <processor/scratchpad.h>
 
+#include <asm/io.h>
+#include <asm/pgtable.h>
+#include <asm/tlbflush.h>
+
 
 unsigned long virt_sp_free(unsigned long addr, unsigned long len)
 {
@@ -44,6 +48,60 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len)
     }
 
 }
+static int pcache_mapcount_is_zero(struct pcache_meta *pcm)
+{
+	return !pcache_mapcount(pcm);
+}
+
+static inline void __pcache_remove_rmap(struct pcache_meta *pcm,
+				        struct pcache_rmap *rmap)
+{
+	list_del(&rmap->next);
+	free_pcache_rmap(rmap);
+
+	/*
+	 * There is no PTE map to this pcache anymore
+	 * Clear the Valid bit
+	 */
+	if (likely(pcache_mapcount_dec_and_test(pcm)))
+		ClearPcacheValid(pcm);
+}
+static int sp_try_to_unmap_one(struct pcache_meta *pcm,
+                    struct pcache_rmap *rmap, void *arg)
+{
+    int ret = PCACHE_RMAP_AGAIN;
+	bool *dirty = arg;
+	spinlock_t *ptl = NULL;
+	pte_t *pte;
+	pte_t pteval;
+
+	PCACHE_BUG_ON_RMAP(RmapReserved(rmap), rmap);
+    /* we only unmap the new virt addr */
+    if (rmap->address>=mmap_base()-(1UL<<30)*128){
+        pte = rmap_get_pte_locked(pcm, rmap, &ptl);
+	    if (unlikely(!pte))
+		    return ret;
+        pteval = ptep_get_and_clear(0, pte);
+        if (likely(pte_present(pteval))) {
+		
+		    if (pte_dirty(pteval))
+			    *dirty = true;
+
+		
+		    flush_tlb_mm_range(rmap->owner_mm,
+				    rmap->address,
+				    rmap->address + PAGE_SIZE -1);
+	    }
+    }
+
+    __pcache_remove_rmap(pcm, rmap);
+    if (rmap->address>=mmap_base()-(1UL<<30)*128){
+        spin_unlock(ptl);
+    }
+    return ret;
+}
+
+
 
 int sp_try_to_unmap(struct pcache_meta *pcm)
 {
@@ -161,39 +219,3 @@ static unsigned long mmap_base(void)
 
 	return PAGE_ALIGN(TASK_SIZE - gap);
 }
-
-static int sp_try_to_unmap_one(struct pcache_meta *pcm,
-                    struct pcache_ramp *rmap, void *arg)
-{
-    int ret = PCACHE_RMAP_AGAIN;
-	bool *dirty = arg;
-	spinlock_t *ptl = NULL;
-	pte_t *pte;
-	pte_t pteval;
-
-	PCACHE_BUG_ON_RMAP(RmapReserved(rmap), rmap);
-    /* we only unmap the new virt addr */
-    if (rmap->address>=mmap_base()-(1UL<<30)*128){
-        pte = rmap_get_pte_locked(pcm, rmap, &ptl);
-	    if (unlikely(!pte))
-		    return ret;
-        pteval = ptep_get_and_clear(0, pte);
-        if (likely(pte_present(pteval))) {
-		
-		    if (pte_dirty(pteval))
-			    *dirty = true;
-
-		
-		    flush_tlb_mm_range(rmap->owner_mm,
-				    rmap->address,
-				    rmap->address + PAGE_SIZE -1);
-	    }
-    }
-
-    __pcache_remove_rmap(pcm, rmap);
-    if (rmap->address>=mmap_base()-(1UL<<30)*128){
-        spin_unlock(ptl);
-    }
-    return ret;
-}
-

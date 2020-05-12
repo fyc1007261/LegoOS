@@ -315,7 +315,7 @@ void __init pcache_print_info(void)
 }
 
 /**
- * pcache_range_register
+ * 
  * @start: physical address of the first byte of the cache
  * @size: size of the cache
  *

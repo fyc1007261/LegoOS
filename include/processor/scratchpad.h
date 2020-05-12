@@ -124,5 +124,8 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
             unsigned long old_virt_address, unsigned long len);
 int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_addr, unsigned long len);
 unsigned long virt_sp_free(unsigned long addr, unsigned long len);
+int sp_add_rmap(struct pcache_meta *pcm, pte_t *page_table, unsigned long address,
+            struct mm_struct *owner_mm, struct task_struct *owner_process,
+            enum rmap_caller caller);
 
 #endif

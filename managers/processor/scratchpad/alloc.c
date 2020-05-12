@@ -8,6 +8,8 @@
 #include <lego/syscalls.h>
 #include <lego/jiffies.h>
 #include <lego/profile.h>
+#include <lego/fit_ibapi.h>
+#include <processor/distvm.h>
 #include <processor/pcache.h>
 #include <processor/processor.h>
 #include <processor/scratchpad.h>

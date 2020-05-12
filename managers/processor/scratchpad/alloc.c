@@ -62,7 +62,7 @@ static inline void prep_new_pcache_meta(struct pcache_meta *pcm)
 	init_pcache_ref_count(pcm);
 }
 
-struct pcache_meta *sp_alloc_one_pcm()
+struct pcache_meta *sp_alloc_one_pcm(void)
 {
     struct pcache_meta *pcm;
     struct pcache_set *pset = sp_set_map;

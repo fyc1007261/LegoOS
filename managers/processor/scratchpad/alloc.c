@@ -13,7 +13,6 @@
 #include <lego/kernel.h>
 #include <processor/pcache.h>
 #include <processor/processor.h>
-#include <processor/distvm.h>
 #include <processor/scratchpad.h>
 
 unsigned long virt_sp_alloc(unsigned long len){

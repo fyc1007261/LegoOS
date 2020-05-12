@@ -53,7 +53,7 @@
 #define P2M_DROP_CACHE		((__u32)__NR_drop_page_cache)
 
 //cxy: scratchpad related operations
-#define P2M_SP_ALLOC    ((__u32)__NR_rename)
+#define P2M_SP_ALLOC    ((__u32)__NR_sp_alloc)
 #define P2M_SP_FREE     ((__u32)__NR_sp_free)
   
 

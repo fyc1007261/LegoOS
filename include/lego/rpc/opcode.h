@@ -53,8 +53,8 @@
 #define P2M_DROP_CACHE		((__u32)__NR_drop_page_cache)
 
 //cxy: scratchpad related operations
-#define P2M_SP_ALLOC		((__u32)__NR_sp_alloc)
-#define P2M_SP_FREE		((__u32)__NR_sp_free)
+#define P2M_SP_ALLOC		((__u32)__NR_sp_pin)
+#define P2M_SP_FREE		((__u32)__NR_sp_unpin)
   
 
 /* Processor to Storage directly */

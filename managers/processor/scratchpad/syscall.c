@@ -11,7 +11,7 @@
 #include <processor/processor.h>
 #include <processor/scratchpad.h>
 
-asmlinkage long sys_sp_pin(unsigned addr,unsigned long len) {
+asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len) {
     /* alloc the virtual memory from m component side */
     unsigned long va = virt_sp_alloc(len);
     if (va<=0){
@@ -25,7 +25,7 @@ asmlinkage long sys_sp_pin(unsigned addr,unsigned long len) {
     return va;
 }
 
-asmlinkage long sys_sp_unpin(unsigned old_addr, unsigned long new_addr, unsigned long len){
+asmlinkage long sys_sp_unpin(unsigned long old_addr, unsigned long new_addr, unsigned long len){
     int ret;
     ret = remove_mapping(current->mm,old_addr, new_addr, len);
     if(ret<0){

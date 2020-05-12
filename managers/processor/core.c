@@ -64,19 +64,8 @@ static int procmgmt(void *unused)
 #endif
 
 #if 1
-	init_filename = "/usr/local/pgsql/bin/postgres";
+	init_filename = "/bigdisk/pin";
 	argv_init[0] = init_filename;
-	argv_init[1] = "--single";
-//	argv_init[1] = "-E";
-	argv_init[2] = "-D";
-	argv_init[3] = "/bigdisk/psql2/data";
-	argv_init[4] = "-s";
-	argv_init[5] = "-d";
-	argv_init[6] = "3";
-	// init_filename = "/usr/local/bin/sqlite3";
-	// argv_init[0] = init_filename;
-	// argv_init[1] = "-init";
-	// argv_init[2] = "/users/yifancai/test.sql";
 #endif
 
 	/*

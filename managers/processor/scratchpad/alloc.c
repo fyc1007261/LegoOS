@@ -9,6 +9,8 @@
 #include <lego/jiffies.h>
 #include <lego/profile.h>
 #include <lego/fit_ibapi.h>
+#include <lego/uaccess.h>
+#include <lego/kernel.h>
 #include <processor/distvm.h>
 #include <processor/pcache.h>
 #include <processor/processor.h>

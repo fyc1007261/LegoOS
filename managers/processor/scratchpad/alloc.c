@@ -227,7 +227,7 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
     if(nr_pcm_alloc>sp_nr_cachelines-sp_current_used){
         return -1;
     }
-    int i=0;
+    int i;
     for (i=0;i<nr_pcm_alloc;i++){
         pcm = sp_alloc_one_pcm();
         ret = build_new_mapping_one_page(mm, new_virt_address+i*PAGE_SIZE, 

@@ -17,7 +17,7 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len)
 {
     struct p2m_sp_free_struct payload;
     struct p2m_sp_free_reply_struct reply;
-    long ret_len;
+    long retlen;
 
     if (offset_in_page(addr) || addr > TASK_SIZE || len > TASK_SIZE - addr)
 		return -EINVAL;
@@ -29,12 +29,12 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len)
     payload.addr = addr;
     payload.len = len;
 
-    retlen = net_send_reply_timeout(current_memory_home_node(), P2M_SP_FREE,
+    /*retlen = net_send_reply_timeout(current_memory_home_node(), P2M_SP_FREE,
 			&payload, sizeof(payload), &retbuf, sizeof(retbuf),
-			false, DEF_NET_TIMEOUT);
+			false, DEF_NET_TIMEOUT);*/
     if (unlikely(retlen != sizeof(retbuf))) {
 		retbuf.ret = -EIO;
-		goto out;
+		return retbuf.ret;
 	}
     if (likely(retbuf.ret == 0)) {
         return retbuf.ret;
@@ -47,27 +47,7 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len)
 
 
 
-int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_addr, unsigned long len)
-{
-    
-    len = PAGE_ALIGN(len);
-    if (!len){
-        return -1;
-    }
-    struct pcache_meta *pcm;
-    unsigned long nr_pcm_free = len / PAGE_SIZE;
-    int ret;
-    
-    for (int i=0;i<nr_pcm_free;i++){
-        ret = flush_one_page(mm,new_addr+i*PAGE_SIZE,old_addr+i*PAGE_SIZE);
-        if (ret<0){
-            return -1;
-        }
-    }
 
-
-
-}
 
 int flush_one_page(struct mm_struct *mm, 
             unsigned long new_virt_address, unsigned long old_virt_address)
@@ -86,6 +66,8 @@ int flush_one_page(struct mm_struct *mm,
     struct pcache_meta *new_pcm;
 
     int ret;
+    void* old_kva;
+    void* new_kva;
 
     new_pgd = pgd_offset(mm, new_virt_address);
     new_pud = pud_offset(new_pgd,new_virt_address);
@@ -108,9 +90,9 @@ int flush_one_page(struct mm_struct *mm,
 
     }
     /* data are in pcache: local*/
-    if (likely(pte_present(old_pte))){
-        old_pcm = pte_to_pcache_meta(old_pte);
-        new_pcm = pte_to_sp_meta(new_pte);
+    if (likely(pte_present(*old_pte))){
+        old_pcm = pte_to_pcache_meta(*old_pte);
+        new_pcm = pte_to_sp_meta(*new_pte);
         old_kva = pcache_meta_to_kva(old_pcm);
         new_kva = sp_meta_to_kva(new_pcm);
         memcpy(old_kva, new_kva, PAGE_SIZE);
@@ -127,7 +109,27 @@ int flush_one_page(struct mm_struct *mm,
         return -1;
     }
 }
+int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_addr, unsigned long len)
+{
+    
+    len = PAGE_ALIGN(len);
+    if (!len){
+        return -1;
+    }
+    struct pcache_meta *pcm;
+    unsigned long nr_pcm_free = len / PAGE_SIZE;
+    int ret;
+    int i;
+    for (i=0;i<nr_pcm_free;i++){
+        ret = flush_one_page(mm,new_addr+i*PAGE_SIZE,old_addr+i*PAGE_SIZE);
+        if (ret<0){
+            return -1;
+        }
+    }
 
+
+
+}
 int sp_try_to_unmap(struct pcache_meta *pcm)
 {
     int ret;

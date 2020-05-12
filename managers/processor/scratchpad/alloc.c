@@ -17,10 +17,7 @@ unsigned long virt_sp_alloc(unsigned long len){
     struct p2m_sp_alloc_reply_struct reply;
     long ret_len, ret_addr;
     
-    if (offset_in_page(off))
-		return -EINVAL;
-	if (!len)
-		return -EINVAL;
+    
 	len = PAGE_ALIGN(len);
 	if (!len)
 		return -ENOMEM;
@@ -74,35 +71,6 @@ struct pcache_meta *sp_alloc_one_pcm(){
     return pcm;
 }
 
-int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address, 
-            unsigned long old_virt_address, unsigned long len)
-{
-    len = PAGE_ALIGN(len);
-    if (!len){
-        return -1;
-    }
-    struct pcache_meta *pcm;
-    unsigned long sp_current_used = sp_used();
-    int nr_pcm_alloc = len / PAGE_SIZE;
-    int ret;
-    
-    
-   
-    /* no enough space to pin in scratch pad */
-    if(nr_pcm_alloc>sp_nr_cachelines-sp_current_used){
-        return -1;
-    }
-    
-    for (int i=0;i<nr_pcm_alloc;i++){
-        pcm = sp_alloc_one_pcm();
-        ret = build_new_mapping_one_page(mm, new_virt_address+i*PAGE_SIZE, 
-        old_virt_address+i*PAGE_SIZE,pcm);
-        if (ret<0){
-            return -1;
-        }
-        
-    }
-}
 
 int build_new_mapping_one_page(struct mm_struct *mm,
             unsigned long new_virt_address, unsigned long old_virt_address, struct pcache_meta *new_pcm){
@@ -152,10 +120,11 @@ int build_new_mapping_one_page(struct mm_struct *mm,
     pte_t entry;
     entry = sp_mk_pte(new_pcm, PAGE_SHARED_EXEC);
     
-    page_table = pte_offset_lock(mm, pmd, new_virt_address, &ptl);
+    page_table = pte_offset_lock(mm, new_pmd, new_virt_address, &ptl);
+    
     /* data are in pcache: local*/
-    if (likely(pte_present(old_pte))))){
-        old_pcm = pte_to_pcache_meta(old_pte);
+    if (likely(pte_present(*old_pte))){
+        old_pcm = pte_to_pcache_meta(*old_pte);
         old_kva = pcache_meta_to_kva(old_pcm);
         new_kva = sp_meta_to_kva(new_pcm);
         /* copy from kernel virtual address to kernel virtual address*/
@@ -198,6 +167,36 @@ out:
     return ret;
     
 }
+int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address, 
+            unsigned long old_virt_address, unsigned long len)
+{
+    len = PAGE_ALIGN(len);
+    if (!len){
+        return -1;
+    }
+    struct pcache_meta *pcm;
+    unsigned long sp_current_used = sp_used();
+    int nr_pcm_alloc = len / PAGE_SIZE;
+    int ret;
+    
+    
+   
+    /* no enough space to pin in scratch pad */
+    if(nr_pcm_alloc>sp_nr_cachelines-sp_current_used){
+        return -1;
+    }
+    int i=0;
+    for (i=0;i<nr_pcm_alloc;i++){
+        pcm = sp_alloc_one_pcm();
+        ret = build_new_mapping_one_page(mm, new_virt_address+i*PAGE_SIZE, 
+        old_virt_address+i*PAGE_SIZE,pcm);
+        if (ret<0){
+            return -1;
+        }
+        
+    }
+}
+
 
 int sp_do_fill_page(unsigned long address, struct pcache_meta *pcm){
 

@@ -11,14 +11,11 @@
 #include <lego/fit_ibapi.h>
 #include <lego/uaccess.h>
 #include <lego/kernel.h>
-#include <lego/comp_common.h>
 #include <processor/distvm.h>
 #include <processor/pcache.h>
 #include <processor/processor.h>
 #include <processor/scratchpad.h>
-#include <processor/fs.h>
-#include <processor/pgtable.h>
-#include <processor/zerofill.h>
+
 unsigned long virt_sp_alloc(unsigned long len){
     struct p2m_sp_alloc_struct payload;
     struct p2m_sp_alloc_reply_struct reply;

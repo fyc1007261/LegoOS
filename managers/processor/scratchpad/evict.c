@@ -48,6 +48,63 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len)
     }
 
 }
+
+#define MIN_GAP	(128*1024*1024UL)
+#define MAX_GAP	(TASK_SIZE/6*5)
+
+static unsigned long mmap_base(void)
+{
+	unsigned long gap = 0; /* TODO: rlimit */
+
+	if (gap < MIN_GAP)
+		gap = MIN_GAP;
+	else if (gap > MAX_GAP)
+		gap = MAX_GAP;
+
+	return PAGE_ALIGN(TASK_SIZE - gap);
+}
+
+static __always_inline pte_t *
+__rmap_get_pte_locked(struct pcache_meta *pcm, struct pcache_rmap *rmap,
+		      spinlock_t **ptlp, void *caller) __acquires(*ptlp)
+{
+	pte_t *ptep;
+	pmd_t *pmd;
+	spinlock_t *ptl;
+	struct mm_struct *mm = rmap->owner_mm;
+	unsigned long address = rmap->address;
+
+	pmd = rmap_get_pmd(mm, address);
+	ptep = pte_offset(pmd, address);
+
+	if (unlikely(ptep != rmap->page_table)) {
+		report_bad_rmap(pcm, rmap, address, ptep, caller);
+		ptep = NULL;
+		goto out;
+	}
+
+	if (unlikely(pcache_meta_to_pfn(pcm) != pte_pfn(*ptep))) {
+		report_bad_rmap(pcm, rmap, address, ptep, caller);
+		ptep = NULL;
+		goto out;
+	}
+
+	ptl = pte_lockptr(mm, pmd);
+	spin_lock(ptl);
+	*ptlp = ptl;
+
+out:
+	return ptep;
+}
+
+static __always_inline pte_t *
+rmap_get_pte_locked(struct pcache_meta *pcm, struct pcache_rmap *rmap,
+		    spinlock_t **ptlp) __acquires(*ptlp)
+{
+	return __rmap_get_pte_locked(pcm, rmap, ptlp,
+				     __builtin_return_address(0));
+}
+
 static int pcache_mapcount_is_zero(struct pcache_meta *pcm)
 {
 	return !pcache_mapcount(pcm);
@@ -203,19 +260,4 @@ int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_ad
 
 
 
-}
-
-#define MIN_GAP	(128*1024*1024UL)
-#define MAX_GAP	(TASK_SIZE/6*5)
-
-static unsigned long mmap_base(void)
-{
-	unsigned long gap = 0; /* TODO: rlimit */
-
-	if (gap < MIN_GAP)
-		gap = MIN_GAP;
-	else if (gap > MAX_GAP)
-		gap = MAX_GAP;
-
-	return PAGE_ALIGN(TASK_SIZE - gap);
 }

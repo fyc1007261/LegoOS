@@ -88,7 +88,7 @@ out:
 	return rmap;
 }
 
-static void free_pcache_rmap(struct pcache_rmap *rmap)
+void free_pcache_rmap(struct pcache_rmap *rmap)
 {
 	PCACHE_BUG_ON_RMAP(RmapReserved(rmap), rmap);
 

@@ -24,7 +24,7 @@ void __init alloc_sp_rmap_map(void)
     size = sizeof(struct pcache_rmap);
     total = size *sp_nr_cachelines;
 
-    sp_rmap_map = memblock_virt_block(total, PAGE_SIZE);
+    sp_rmap_map = memblock_virt_alloc(total, PAGE_SIZE);
     if (!sp_rmap_map){
         panic("sp: unable to allocate rmap map!");
     }
@@ -65,7 +65,7 @@ int sp_add_rmap(struct pcache_meta *pcm, pte_t *page_table, unsigned long addres
             struct mm_struct *owner_mm, struct task_struct *owner_process,
             enum rmap_caller caller)
 {
-    struct pcache_rmap *rmap *pos;
+    struct pcache_rmap *rmap, *pos;
     int ret;
 
     PCACHE_BUG_ON_PCM(PcacheLocked(pcm), pcm);
@@ -98,7 +98,7 @@ int sp_add_rmap(struct pcache_meta *pcm, pte_t *page_table, unsigned long addres
  add:
     ret = 0;
     list_add(&rmap->next, &pcm->rmap);
-    atmoic_inc(&pcm->mapcount);
+    atomic_inc(&pcm->mapcount);
 
 out:
     unlock_pcache(pcm);

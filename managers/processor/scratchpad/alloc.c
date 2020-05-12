@@ -27,9 +27,9 @@ unsigned long virt_sp_alloc(unsigned long len){
 		return -ENOMEM;
     payload.pid = current->pid;
     payload.len = len;
-    /*ret_len = net_send_reply_timeout(current_memory_home_node(), P2M_SP_ALLOC,
+    ret_len = net_send_reply_timeout(current_memory_home_node(), P2M_SP_ALLOC,
 			&payload, sizeof(payload), &reply, sizeof(reply),
-			false, DEF_NET_TIMEOUT);*/
+			false, DEF_NET_TIMEOUT);
     if (likely(ret_len == sizeof(reply))) {
 		if (likely(reply.ret == RET_OKAY))
 			ret_addr = reply.ret_sp;

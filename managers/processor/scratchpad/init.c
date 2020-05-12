@@ -197,7 +197,7 @@ int __init sp_range_register(u64 start){
     if (WARN_ON(!start))
 		return -EINVAL;
 
-	if (WARN_ON(offset_in_page(start) || offset_in_page(size)))
+	if (WARN_ON(offset_in_page(start)))
 		return -EINVAL;
 
 	if (sp_registered_start || sp_registered_size)

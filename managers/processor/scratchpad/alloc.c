@@ -74,6 +74,43 @@ struct pcache_meta *sp_alloc_one_pcm()
     return pcm;
 }
 
+int sp_do_fill_page(unsigned long address, struct pcache_meta *pcm){
+
+    struct p2m_pcache_miss_msg msg;
+    void *kva = sp_meta_to_kva(pcm);
+    int ret, len, dst_nid;
+
+    dst_nid = get_memory_node(current, address);
+    fill_common_header(&msg, P2M_PCACHE_MISS);
+    msg.has_flush_msg = 0;
+    msg.pid = current->pid;
+    msg.tgid = current->tgid;
+    msg.flags = 0;
+    msg.missing_vaddr = address;
+
+    len = ibapi_send_reply_timeout(dst_nid, &msg, sizeof(msg),
+					       kva, PCACHE_LINE_SIZE, false,
+					       DEF_NET_TIMEOUT);
+    if (unlikely(len < (int)PCACHE_LINE_SIZE)) {
+		if (likely(len == sizeof(int))) {
+			ret = -EFAULT;
+			goto out;
+		} else if (len < 0) {
+			ret = len;
+			WARN_ON_ONCE(1);
+			goto out;
+		} else {
+			WARN(1, "Invalid reply length: %d\n", len);
+			ret = -EFAULT;
+			goto out;
+		}
+	}
+
+	ret = 0;
+out:
+	return ret;
+}
+
 
 int build_new_mapping_one_page(struct mm_struct *mm,
             unsigned long new_virt_address, unsigned long old_virt_address, struct pcache_meta *new_pcm){
@@ -201,41 +238,4 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
     return 0;
 }
 
-
-int sp_do_fill_page(unsigned long address, struct pcache_meta *pcm){
-
-    struct p2m_pcache_miss_msg msg;
-    void *kva = sp_meta_to_kva(pcm);
-    int ret, len, dst_nid;
-
-    dst_nid = get_memory_node(current, address);
-    fill_common_header(&msg, P2M_PCACHE_MISS);
-    msg.has_flush_msg = 0;
-    msg.pid = current->pid;
-    msg.tgid = current->tgid;
-    msg.flags = 0;
-    msg.missing_vaddr = address;
-
-    len = ibapi_send_reply_timeout(dst_nid, &msg, sizeof(msg),
-					       kva, PCACHE_LINE_SIZE, false,
-					       DEF_NET_TIMEOUT);
-    if (unlikely(len < (int)PCACHE_LINE_SIZE)) {
-		if (likely(len == sizeof(int))) {
-			ret = -EFAULT;
-			goto out;
-		} else if (len < 0) {
-			ret = len;
-			WARN_ON_ONCE(1);
-			goto out;
-		} else {
-			WARN(1, "Invalid reply length: %d\n", len);
-			ret = -EFAULT;
-			goto out;
-		}
-	}
-
-	ret = 0;
-out:
-	return ret;
-}
 

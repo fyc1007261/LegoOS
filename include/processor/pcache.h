@@ -649,6 +649,7 @@ void pcache_referenced_trylock(struct pcache_meta *pcm,
 
 int pcache_try_to_unmap_reserve(struct pcache_meta *pcm);
 int pcache_free_reserved_rmap(struct pcache_meta *pcm);
+int sp_flush_one(struct pcache_meta *pcm);
 
 typedef int (*fill_func_t)(unsigned long, unsigned long, struct pcache_meta *, void *);
 

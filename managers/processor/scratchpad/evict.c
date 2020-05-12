@@ -16,7 +16,7 @@
 unsigned long virt_sp_free(unsigned long addr, unsigned long len)
 {
     struct p2m_sp_free_struct payload;
-    struct p2m_sp_free_reply_struct reply;
+    struct p2m_sp_free_reply_struct retbuf;
     long retlen;
 
     if (offset_in_page(addr) || addr > TASK_SIZE || len > TASK_SIZE - addr)
@@ -45,7 +45,23 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len)
 
 }
 
+int sp_try_to_unmap(struct pcache_meta *pcm)
+{
+    int ret;
+	bool dirty = false;
+	struct rmap_walk_control rwc = {
+		.rmap_one = sp_try_to_unmap_one,
+		.done = pcache_mapcount_is_zero,
+		.arg = &dirty,
+	};
 
+	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
+
+	ret = rmap_walk(pcm, &rwc);
+	if (!pcache_mapcount(pcm))
+		ret = PCACHE_RMAP_SUCCEED;
+	return ret;
+}
 
 
 
@@ -130,23 +146,7 @@ int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_ad
 
 
 }
-int sp_try_to_unmap(struct pcache_meta *pcm)
-{
-    int ret;
-	bool dirty = false;
-	struct rmap_walk_control rwc = {
-		.rmap_one = sp_try_to_unmap_one,
-		.done = pcache_mapcount_is_zero,
-		.arg = &dirty,
-	};
 
-	PCACHE_BUG_ON_PCM(!PcacheLocked(pcm), pcm);
-
-	ret = rmap_walk(pcm, &rwc);
-	if (!pcache_mapcount(pcm))
-		ret = PCACHE_RMAP_SUCCEED;
-	return ret;
-}
 #define MIN_GAP	(128*1024*1024UL)
 #define MAX_GAP	(TASK_SIZE/6*5)
 

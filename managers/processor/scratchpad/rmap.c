@@ -9,6 +9,7 @@
 #include <lego/profile_point.h>
 #include <processor/pcache.h>
 #include <processor/processor.h>
+#include <processor/scratchpad.h>
 
 #include <asm/io.h>
 #include <asm/pgtable.h>

@@ -23,7 +23,7 @@
 void __init kick_off_user(void);
 void __init processor_manager_early_init(void);
 void __init processor_manager_init(void);
-//int __init pcache_range_register(u64 start, u64 size);
+int __init pcache_range_register(u64 start, u64 size);
 int __init sp_range_register(u64 start);
 
 /* Callback for fork() to initialize processor_manager data */
@@ -60,11 +60,11 @@ static inline void kick_off_user(void) { }
 static inline void processor_manager_init(void) { }
 static inline void processor_manager_early_init(void) { }
 static inline void fork_processor_data(struct task_struct *s, struct task_struct *t, unsigned long f) { }
-/*
+
 static inline int pcache_range_register(u64 start, u64 size)
 {
 	return 0;
-}*/
+}
 
 static inline int sp_range_register(u64 start)
 {

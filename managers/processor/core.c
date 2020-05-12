@@ -154,6 +154,7 @@ void __init processor_manager_init(void)
 {
 	common_header_check();
 	pcache_post_init();
+	sp_post_init();
 	pcache_zerofill_notify_init();
 
 #ifndef CONFIG_FIT
@@ -179,6 +180,8 @@ void __init processor_manager_init(void)
 void __init processor_manager_early_init(void)
 {
 	pcache_early_init();
+	sp_early_init();
+
 }
 
 #ifndef CONFIG_CHECKPOINT

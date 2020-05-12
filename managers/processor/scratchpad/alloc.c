@@ -20,8 +20,8 @@ unsigned long virt_sp_alloc(unsigned long len){
     struct p2m_sp_alloc_struct payload;
     struct p2m_sp_alloc_reply_struct reply;
     long ret_len, ret_addr;
-    struct common_header *hdr;
-    hdr->opcode = P2M_SP_ALLOC;
+    
+    
     
     
 	len = PAGE_ALIGN(len);

@@ -55,7 +55,8 @@ static inline void prep_new_pcache_meta(struct pcache_meta *pcm)
 	init_pcache_ref_count(pcm);
 }
 
-struct pcache_meta *sp_alloc_one_pcm(){
+struct pcache_meta *sp_alloc_one_pcm()
+{
     struct pcache_meta *pcm;
     struct pcache_set *pset = sp_set_map;
     spin_lock(&pset->free_lock);
@@ -141,7 +142,7 @@ int build_new_mapping_one_page(struct mm_struct *mm,
     }
     
     
-    pte_set(pte, entry);
+    pte_set(new_pte, entry);
     /* TODO: add rmap information */
     ret = sp_add_rmap(new_pcm, page_table, old_virt_address,
 			      mm, current->group_leader, RMAP_SP_COPY);
@@ -195,6 +196,7 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
         }
         
     }
+    return 0;
 }
 
 

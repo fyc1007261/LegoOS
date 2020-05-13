@@ -129,11 +129,13 @@ void __init sp_early_init(void){
 }
 
 void __init sp_post_init(void){
+    pr_info("Start: sp_post_init");
     int ret;
 
 #ifdef CONFIG_PROCESSOR_MEMMAP_MEMBLOCK_RESERVED
 	sp_virt_start_cacheline = (unsigned long)phys_to_virt(sp_registered_start);
 #else
+    pr_info("Continue1: sp_post_init");
 	sp_virt_start_cacheline = (unsigned long)ioremap_cache(sp_registered_start,
 							    sp_registered_size);
 	if (!sp_virt_start_cacheline)
@@ -141,14 +143,17 @@ void __init sp_post_init(void){
 			sp_registered_start + sp_registered_size);
 #endif 
 
-
+    pr_info("Continue2: sp_post_init");
     memset((void *)sp_virt_start_cacheline, 0, sp_registered_size);
-
+    pr_info("Continue3: sp_post_init");
     sp_meta_map = (struct pcache_meta *)(sp_virt_start_cacheline+sp_nr_cachelines*PAGE_SIZE);
-    
+    pr_info("Continue4: sp_post_init");
     init_sp_meta_map();  
-    init_sp_meta_map();
+    pr_info("Continue5: sp_post_init");
+    init_sp_set_map();
+    pr_info("Continue6: sp_post_init");
     init_sp_set_free_list();
+    pr_info("Continue7: sp_post_init");
 
     sp_print_info(); 
 }

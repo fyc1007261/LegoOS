@@ -253,6 +253,6 @@ asmlinkage long sys_epoll_wait(int epfd, struct epoll_event __user *events,
 				int maxevents, int timeout);
 asmlinkage long sys_poll(struct pollfd __user *ufds, unsigned int nfds,
 			long timeout_msecs);
-asmlinkage long sys_sp_pin(unsigned long, unsigned long);
-asmlinkage long sys_sp_unpin(unsigned long, unsigned long, unsigned long);
+asmlinkage long sys_sp_pin(unsigned long addr, unsigned long len);
+asmlinkage long sys_sp_unpin(unsigned long old_addr, unsigned long new_addr, unsigned long len);
 #endif /* _LEGO_SYSCALLS_H_ */

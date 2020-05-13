@@ -81,7 +81,8 @@ static unsigned long
 arch_get_unmapped_area_topdown(struct lego_task_struct *p, struct lego_file *filp,
 		const unsigned long addr0, const unsigned long len,
 		const unsigned long pgoff, const unsigned long flags, const int sp_flag)
-{
+{   
+	pr_info("Start: arch_get_unmapped_area_topdown");
 	struct vm_area_struct *vma = NULL;
 	struct lego_mm_struct *mm = p->mm;
 	unsigned long addr = addr0;
@@ -101,6 +102,7 @@ arch_get_unmapped_area_topdown(struct lego_task_struct *p, struct lego_file *fil
 	if (addr && VMR_ALIGN(addr) != addr) {
 #else
 	if (addr) {
+		pr_info("S1: arch_get_unmapped_area_topdown");
 #endif
 		addr = PAGE_ALIGN(addr);
 		vma = find_vma(mm, addr);
@@ -116,18 +118,24 @@ arch_get_unmapped_area_topdown(struct lego_task_struct *p, struct lego_file *fil
 #else
 	info.low_limit = PAGE_SIZE;
 #endif
+	pr_info("S2: arch_get_unmapped_area_topdown");
 	info.high_limit = mm->mmap_base;
 	if(sp_flag==1){
+		pr_info("S3: arch_get_unmapped_area_topdown");
 		info.high_limit = mm->mmap_base;
 		info.low_limit = mm->mmap_base-(1UL<<30)*128;
 	}
 	else{
 		info.high_limit = mm->mmap_base-(1UL<<30)*128-PAGE_SIZE;
 	}
+	pr_info("S4: arch_get_unmapped_area_topdown");
+	pr_info("arch_get_unmapped_area_topdown:high: %#llx\n",info.high_limit);
+	pr_info("arch_get_unmapped_area_topdown:low: %#llx\n",info.low_limit);
 	info.align_mask = 0;
 	info.align_offset = pgoff << PAGE_SHIFT;
 
 	addr = vm_unmapped_area(p, &info);
+	pr_info("S4:return addr %#llx\n",addr);
 	if (!(addr & ~PAGE_MASK))
 		return addr;
 	BUG_ON(addr != -ENOMEM);
@@ -138,6 +146,7 @@ arch_get_unmapped_area_topdown(struct lego_task_struct *p, struct lego_file *fil
 	 * can happen with large stack limits and large mmap()
 	 * allocations.
 	 */
+	pr_info("S5:arch_get_unmapped_area_topdown");
 	return arch_get_unmapped_area(p, filp, addr0, len, pgoff, flags);
 }
 
@@ -2331,6 +2340,7 @@ unsigned long do_sp_alloc(struct lego_task_struct *p, unsigned long len){
 
     /* sp alloc */
     newaddr = get_unmapped_area(p,NULL,NULL,len,0,MAP_ANONYMOUS,1);
+	
     if (offset_in_page(newaddr))
 		return newaddr;
     while (find_vma_links(mm, newaddr, newaddr + len, &prev, &rb_link,

@@ -46,6 +46,7 @@ void handle_p2m_sp_alloc(struct p2m_sp_alloc_struct *payload,
     
     
     newaddr = do_sp_alloc(tsk,len);
+    pr_info("newaddr is: %#llx\n", newaddr);
     tb_set_tx_size(tb, sizeof(long));
     if (unlikely(newaddr < 0)) {
 		reply->ret = newaddr;

@@ -12,6 +12,7 @@
 #include <processor/scratchpad.h>
 
 asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len) {
+#ifdef CONFIG_COMP_PROCESSOR
     /* alloc the virtual memory from m component side */
     pr_info("Start: sys_sp_pin");
     unsigned long va = virt_sp_alloc(len);
@@ -26,9 +27,13 @@ asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len) {
     }
     pr_info("Continue2: sys_sp_pin");
     return va;
+#else
+    return -1;
+#endif
 }
 
 asmlinkage long sys_sp_unpin(unsigned long old_addr, unsigned long new_addr, unsigned long len){
+#ifdef CONFIG_COMP_PROCESSOR
     int ret;
     ret = remove_mapping(current->mm,old_addr, new_addr, len);
     if(ret<0){
@@ -39,5 +44,7 @@ asmlinkage long sys_sp_unpin(unsigned long old_addr, unsigned long new_addr, uns
         return -1;
     }
     return 0;
-
+#else
+    return -1;
+#endif
 }

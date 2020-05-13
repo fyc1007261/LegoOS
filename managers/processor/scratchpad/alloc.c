@@ -142,7 +142,23 @@ int build_new_mapping_one_page(struct mm_struct *mm,
 
 
 
-	new_pgd = pgd_offset(mm, new_virt_address);
+	
+	old_pgd = pgd_offset(mm, old_virt_address);
+    pr_info("S6: build_new_mapping_one_page");
+	old_pud = pud_offset(old_pgd, old_virt_address);
+    pr_info("S7: build_new_mapping_one_page");
+	if (old_pud){
+        pr_info("S8: build_new_mapping_one_page");
+        old_pmd = pmd_offset(old_pud, old_virt_address);
+	    if (old_pmd){
+            pr_info("S9: build_new_mapping_one_page");
+            old_pte = pte_offset(old_pmd,old_virt_address);
+        }
+
+    }
+    pr_info("Start1: build_new_mapping_one_page");
+
+    new_pgd = pgd_offset(mm, new_virt_address);
     pr_info("S0: build_new_mapping_one_page");
 	new_pud = pud_alloc(mm, new_pgd, new_virt_address);
     pr_info("S1: build_new_mapping_one_page");
@@ -159,19 +175,6 @@ int build_new_mapping_one_page(struct mm_struct *mm,
 	if (!new_pte)
 		return VM_FAULT_OOM;
     pr_info("Start0: build_new_mapping_one_page");
-	old_pgd = pgd_offset(mm, old_virt_address);
-    pr_info("S6: build_new_mapping_one_page");
-	old_pud = pud_offset(old_pgd, old_virt_address);
-    pr_info("S7: build_new_mapping_one_page");
-	if (old_pud){
-        pr_info("S8: build_new_mapping_one_page");
-        old_pmd = pmd_offset(old_pud, old_virt_address);
-	    if (old_pmd){
-            old_pte = pte_offset(old_pmd,old_virt_address);
-        }
-
-    }
-    pr_info("Start1: build_new_mapping_one_page");
 	
     
     pte_t entry;
@@ -234,6 +237,8 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
             unsigned long old_virt_address, unsigned long len)
 {
     pr_info("Start: build_new_mapping");
+    pr_info("old virt addr: %#llx\n", old_virt_address);
+    pr_info("old virt addr: %#llx\n", new_virt_address);
     len = PAGE_ALIGN(len);
     if (!len){
         return -1;
@@ -254,7 +259,7 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
         pr_info("Continue1: build_new_mapping");
         pcm = sp_alloc_one_pcm();
         pr_info("Continue2: build_new_mapping");
-        ret = build_new_mapping_one_page(mm, new_virt_address+i*PAGE_SIZE, 
+        ret = build_new_mapping_one_page(mm, new_virt_address-i*PAGE_SIZE, 
         old_virt_address+i*PAGE_SIZE,pcm);
         if (ret<0){
             pr_info("Fail: build_new_mapping");

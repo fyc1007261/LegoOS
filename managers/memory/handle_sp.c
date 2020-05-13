@@ -25,7 +25,6 @@ unsigned long do_sp_alloc(struct lego_task_struct *p, unsigned long len){
     struct lego_mm_struct *mm = p->mm;
     struct vm_area_struct *vma, *prev;
     struct rb_node **rb_link, *rb_parent;
-    unsigned long len;
     unsigned long flags;
     unsigned long newaddr;
     pgoff_t pgoff;
@@ -103,41 +102,6 @@ void handle_p2m_sp_alloc(struct p2m_sp_alloc_struct *payload,
     replicate_vma(tsk,REPLICATE_SP,reply->ret_sp,len,0,0);
 
 }
-
-void handle_p2m_sp_free(struct p2m_sp_free_struct *payload,
-		       struct common_header *hdr, struct thpool_buffer *tb)
-{
-    u32 nid = hdr->src_nid;
-    u32 pid = payload->pid;
-    unsigned long len = payload->len;
-    unsigned long addr = payload->addr;
-    struct lego_task_struct *tsk;
-    struct lego_mm_struct *mm;
-    struct p2m_sp_free_reply_struct *reply;
-               
-    reply = thpool_buffer_tx(tb);
-	tb_set_tx_size(tb, sizeof(*reply));
-
-	tsk = find_lego_task_by_pid(nid, pid);
-	if (unlikely(!tsk)) {
-		reply->ret = RET_ESRCH;
-		return;
-	}
-
-
-	mm = tsk->mm;
-    if (down_write_killable(&tsk->mm->mmap_sem)){
-        reply->ret = RET_EINTR;
-        return;
-
-    }
-    reply->ret = do_sp_free(mm,addr,len);
-
-    up_write(&mm->mmap_sem);
-    replicate_vma(tsk,REPLICATE_SP,addr,len,0,0);
-
-               
-}
 /* very similar to do_munmap() function; but we don't need to remove page table*/
 int do_sp_free(struct lego_mm_struct *mm, unsigned long start, size_t len)
 {
@@ -190,4 +154,39 @@ int do_sp_free(struct lego_mm_struct *mm, unsigned long start, size_t len)
 
 
 
+}
+
+void handle_p2m_sp_free(struct p2m_sp_free_struct *payload,
+		       struct common_header *hdr, struct thpool_buffer *tb)
+{
+    u32 nid = hdr->src_nid;
+    u32 pid = payload->pid;
+    unsigned long len = payload->len;
+    unsigned long addr = payload->addr;
+    struct lego_task_struct *tsk;
+    struct lego_mm_struct *mm;
+    struct p2m_sp_free_reply_struct *reply;
+               
+    reply = thpool_buffer_tx(tb);
+	tb_set_tx_size(tb, sizeof(*reply));
+
+	tsk = find_lego_task_by_pid(nid, pid);
+	if (unlikely(!tsk)) {
+		reply->ret = RET_ESRCH;
+		return;
+	}
+
+
+	mm = tsk->mm;
+    if (down_write_killable(&tsk->mm->mmap_sem)){
+        reply->ret = RET_EINTR;
+        return;
+
+    }
+    reply->ret = do_sp_free(mm,addr,len);
+
+    up_write(&mm->mmap_sem);
+    replicate_vma(tsk,REPLICATE_SP,addr,len,0,0);
+
+               
 }

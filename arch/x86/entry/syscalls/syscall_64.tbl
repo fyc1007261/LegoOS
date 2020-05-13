@@ -127,7 +127,7 @@
 
 # scratchpad related SYSCALL
 317 64 sp_pin    sys_sp_pin
-218 64 sp_unpin    sys_sp_unpin
+318 64 sp_unpin    sys_sp_unpin
 
 #
 # Lego specific SYSCALL

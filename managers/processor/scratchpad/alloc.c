@@ -20,6 +20,7 @@ unsigned long virt_sp_alloc(unsigned long len){
     struct p2m_sp_alloc_struct payload;
     struct p2m_sp_alloc_reply_struct reply;
     long ret_len, ret_addr;
+    pr_info("Start:virt_sp_alloc");
     
     
     
@@ -214,6 +215,7 @@ out:
 int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address, 
             unsigned long old_virt_address, unsigned long len)
 {
+    pr_info("Start: build_new_mapping");
     len = PAGE_ALIGN(len);
     if (!len){
         return -1;

@@ -13,15 +13,18 @@
 
 asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len) {
     /* alloc the virtual memory from m component side */
+    pr_info("Start: sys_sp_pin");
     unsigned long va = virt_sp_alloc(len);
     if (va<=0){
         return -1;
     }
     int ret;
+    pr_info("Continue1: sys_sp_pin");
     ret = build_new_mapping(current->mm, va, addr, len);
     if (ret<0){
         return -1;
     }
+    pr_info("Continue2: sys_sp_pin");
     return va;
 }
 

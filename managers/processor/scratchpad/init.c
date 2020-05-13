@@ -92,6 +92,7 @@ static void __init init_sp_set_free_list(void){
 void __init sp_early_init(void){
     u64 sp_nr_cachelines_per_page, sp_nr_units;
     u64 sp_unit_size;
+    pr_info("Start:sp_early_init ");
     
     if (sp_registered_start == 0 || sp_registered_size ==0){
         panic("sp: sp not registered, memmap $ needed!");

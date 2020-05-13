@@ -143,25 +143,35 @@ int build_new_mapping_one_page(struct mm_struct *mm,
 
 
 	new_pgd = pgd_offset(mm, new_virt_address);
+    pr_info("S0: build_new_mapping_one_page");
 	new_pud = pud_alloc(mm, new_pgd, new_virt_address);
+    pr_info("S1: build_new_mapping_one_page");
 	if (!new_pud)
 		return VM_FAULT_OOM;
+    pr_info("S2 build_new_mapping_one_page");
 	new_pmd = pmd_alloc(mm, new_pud, new_virt_address);
+    pr_info("S3: build_new_mapping_one_page");
 	if (!new_pmd)
 		return VM_FAULT_OOM;
+    pr_info("S4: build_new_mapping_one_page");
 	new_pte = pte_alloc(mm, new_pmd, new_virt_address);
+    pr_info("S5: build_new_mapping_one_page");
 	if (!new_pte)
 		return VM_FAULT_OOM;
-
+    pr_info("Start0: build_new_mapping_one_page");
 	old_pgd = pgd_offset(mm, old_virt_address);
+    pr_info("S6: build_new_mapping_one_page");
 	old_pud = pud_offset(old_pgd, old_virt_address);
+    pr_info("S7: build_new_mapping_one_page");
 	if (old_pud){
+        pr_info("S8: build_new_mapping_one_page");
         old_pmd = pmd_offset(old_pud, old_virt_address);
 	    if (old_pmd){
             old_pte = pte_offset(old_pmd,old_virt_address);
         }
 
     }
+    pr_info("Start1: build_new_mapping_one_page");
 	
     
     pte_t entry;

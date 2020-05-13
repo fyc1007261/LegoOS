@@ -19,10 +19,12 @@ asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len) {
     if (va<=0){
         return -1;
     }
+    pr_info("sys_sp_pin: va return")
     int ret;
-    pr_info("Continue1: sys_sp_pin");
+    pr_info("Continue1: sys_sp_pin    %#llx\n", va);
     ret = build_new_mapping(current->mm, va, addr, len);
     if (ret<0){
+        pr_info("Fail: sys_sp_pin");
         return -1;
     }
     pr_info("Continue2: sys_sp_pin");

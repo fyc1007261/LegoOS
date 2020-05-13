@@ -35,7 +35,8 @@ unsigned long virt_sp_alloc(unsigned long len){
 			false, DEF_NET_TIMEOUT);
     if (likely(ret_len == sizeof(reply))) {
 		if (likely(reply.ret == RET_OKAY))
-			ret_addr = reply.ret_sp;
+            {pr_info("Continue1:virt_sp_alloc");
+			ret_addr = reply.ret_sp;}
 		else
 			ret_addr = (s64)reply.ret;
 	} else
@@ -80,7 +81,7 @@ struct pcache_meta *sp_alloc_one_pcm(void)
 }
 
 int sp_do_fill_page(unsigned long address, struct pcache_meta *pcm){
-
+    pr_info("Start: sp_do_fill_page");
     struct p2m_pcache_miss_msg msg;
     void *kva = sp_meta_to_kva(pcm);
     int ret, len, dst_nid;
@@ -119,6 +120,7 @@ out:
 
 int build_new_mapping_one_page(struct mm_struct *mm,
             unsigned long new_virt_address, unsigned long old_virt_address, struct pcache_meta *new_pcm){
+    pr_info("Start: build_new_mapping_one_page");
     pgd_t *new_pgd;
 	pud_t *new_pud;
 	pmd_t *new_pmd;
@@ -166,9 +168,10 @@ int build_new_mapping_one_page(struct mm_struct *mm,
     entry = sp_mk_pte(new_pcm, PAGE_SHARED_EXEC);
     
     page_table = pte_offset_lock(mm, new_pmd, new_virt_address, &ptl);
-    
+    pr_info("Continue1: build_new_mapping_one_page");
     /* data are in pcache: local*/
     if (likely(pte_present(*old_pte))){
+        pr_info("Continue2: build_new_mapping_one_page");
         old_pcm = pte_to_pcache_meta(*old_pte);
         old_kva = pcache_meta_to_kva(old_pcm);
         new_kva = sp_meta_to_kva(new_pcm);
@@ -178,13 +181,14 @@ int build_new_mapping_one_page(struct mm_struct *mm,
     }
     /* data are in remote memory */
     else{
+        pr_info("Continue3: build_new_mapping_one_page");
         ret = sp_do_fill_page(old_virt_address,new_pcm);
         if(unlikely(ret)){
             ret = VM_FAULT_SIGSEGV;
             goto out;
         }
     }
-    
+    pr_info("Continue4: build_new_mapping_one_page");
     
     pte_set(new_pte, entry);
     /* TODO: add rmap information */
@@ -195,6 +199,7 @@ int build_new_mapping_one_page(struct mm_struct *mm,
 		ret = VM_FAULT_OOM;
 		goto out;
 	}
+    pr_info("Continue5: build_new_mapping_one_page");
     ret = sp_add_rmap(new_pcm, page_table, new_virt_address,
 			      mm, current->group_leader, RMAP_SP_COPY);
     if (unlikely(ret)) {
@@ -233,10 +238,13 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
     }
     int i;
     for (i=0;i<nr_pcm_alloc;i++){
+        pr_info("Continue1: build_new_mapping");
         pcm = sp_alloc_one_pcm();
+        pr_info("Continue2: build_new_mapping");
         ret = build_new_mapping_one_page(mm, new_virt_address+i*PAGE_SIZE, 
         old_virt_address+i*PAGE_SIZE,pcm);
         if (ret<0){
+            pr_info("Fail: build_new_mapping");
             return -1;
         }
         

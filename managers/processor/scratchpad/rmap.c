@@ -67,6 +67,7 @@ int sp_add_rmap(struct pcache_meta *pcm, pte_t *page_table, unsigned long addres
 {
     struct pcache_rmap *rmap, *pos;
     int ret;
+    pr_info("Start: sp_add_rmap");
 
     PCACHE_BUG_ON_PCM(PcacheLocked(pcm), pcm);
 	PCACHE_BUG_ON(caller >= NR_RMAP_CALLER);

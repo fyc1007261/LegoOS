@@ -170,6 +170,8 @@ int do_brk(struct lego_task_struct *p, unsigned long addr,
 
 void unmap_vmas(struct vm_area_struct *vma, unsigned long start_addr,
 		unsigned long end_addr);
+unsigned long do_sp_alloc(struct lego_task_struct *p, unsigned long len);
+int do_sp_free(struct lego_mm_struct *mm, unsigned long start, size_t len);
 
 /*
  * Look up the first VMA which intersects the interval start_addr..end_addr-1,

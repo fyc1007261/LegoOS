@@ -46,14 +46,14 @@ void handle_p2m_sp_alloc(struct p2m_sp_alloc_struct *payload,
     
     
     newaddr = do_sp_alloc(tsk,len);
-    pr_info("newaddr is: %#llx\n", newaddr);
-    tb_set_tx_size(tb, sizeof(long));
+    
     if (unlikely(newaddr < 0)) {
 		reply->ret = newaddr;
 		return;
 	}
     reply->ret = 0;
-    reply->ret_sp = newaddr;
+    reply->ret_sp = (unsigned long)newaddr;
+    pr_info("newaddr is: %#llx\n", reply->ret_sp);
     replicate_vma(tsk,REPLICATE_SP,reply->ret_sp,len,0,0);
 
 }

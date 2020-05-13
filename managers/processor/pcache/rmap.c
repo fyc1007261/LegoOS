@@ -18,6 +18,7 @@
 #include <lego/profile_point.h>
 #include <processor/pcache.h>
 #include <processor/processor.h>
+#include <processor/scratchpad.h>
 
 #include <asm/io.h>
 #include <asm/pgtable.h>
@@ -876,6 +877,9 @@ int pcache_zap_pte(struct mm_struct *mm, unsigned long address,
 	};
 
 	pcm = pte_to_pcache_meta(ptent);
+	if (!pcm){
+		pcm = pte_to_sp_meta(ptent);
+	}
 	if (unlikely(!pcm)) {
 		pr_info("pte: %p ptent: %#lx address: %#lx\n",
 			pte, (unsigned long)ptent.pte, address);

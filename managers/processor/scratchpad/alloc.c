@@ -259,7 +259,7 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
         pr_info("Continue1: build_new_mapping");
         pcm = sp_alloc_one_pcm();
         pr_info("Continue2: build_new_mapping");
-        ret = build_new_mapping_one_page(mm, new_virt_address-i*PAGE_SIZE, 
+        ret = build_new_mapping_one_page(mm, new_virt_address+i*PAGE_SIZE, 
         old_virt_address+i*PAGE_SIZE,pcm);
         if (ret<0){
             pr_info("Fail: build_new_mapping");

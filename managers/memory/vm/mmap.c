@@ -1264,7 +1264,7 @@ int vma_expandable(struct lego_task_struct *tsk,
 	if (vma->vm_next && vma->vm_next->vm_start < end) /* intersection */
 		return 0;
 	if (get_unmapped_area(tsk, NULL, vma->vm_start, end - vma->vm_start,
-			      0, MAP_FIXED) & ~PAGE_MASK,0)
+			      0, MAP_FIXED,0) & ~PAGE_MASK)
 		return 0;
 	return 1;
 }

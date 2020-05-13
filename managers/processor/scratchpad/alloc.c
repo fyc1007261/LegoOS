@@ -223,7 +223,7 @@ int build_new_mapping_one_page(struct mm_struct *mm,
 		ret = VM_FAULT_OOM;
 		goto out;
 	}
-    
+    pr_info("Continue8: build_new_mapping_one_page");
     return 0;
             
 

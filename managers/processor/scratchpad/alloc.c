@@ -228,7 +228,7 @@ int build_new_mapping_one_page(struct mm_struct *mm,
             
 
 out:
-    put_pcache(new_pcm);
+    
     
     return ret;
     

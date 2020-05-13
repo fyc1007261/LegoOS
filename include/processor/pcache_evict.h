@@ -11,6 +11,7 @@
 #define _LEGO_PROCESSOR_PCACHE_SWEEP_H_
 
 #include <processor/pcache_types.h>
+#include <process/scratchpad.h>
 
 enum evict_status {
 	PCACHE_EVICT_SUCCEED,
@@ -91,8 +92,10 @@ static inline void attach_to_lru(struct pcache_meta *pcm)
 static inline void detach_from_lru(struct pcache_meta *pcm)
 {
 	struct pcache_set *pset;
-
-	pset = pcache_meta_to_pcache_set(pcm);
+    pset = sp_meta_to_pcache_set(pcm);
+	if(!pset){
+		pset = pcache_meta_to_pcache_set(pcm);
+	}
 	del_from_lru_list(pcm, pset);
 }
 

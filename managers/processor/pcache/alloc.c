@@ -19,6 +19,7 @@
 #include <lego/profile.h>
 #include <processor/pcache.h>
 #include <processor/processor.h>
+#include <processor/scratchpad.h>
 
 #include "piggyback.h"
 
@@ -130,8 +131,10 @@ void __put_pcache_nolru(struct pcache_meta *pcm)
 	 */
 	if (PcachePiggybackCached(pcm))
 		return;
-
-	pset = pcache_meta_to_pcache_set(pcm);
+    pset = sp_meta_to_pcache_set(pcm);
+	if(!pset){
+        pset = pcache_meta_to_pcache_set(pcm);
+	}
 	spin_lock(&pset->free_lock);
 	__enqueue_free_list_head(pcm, pset);
 	spin_unlock(&pset->free_lock);

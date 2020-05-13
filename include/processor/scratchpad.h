@@ -119,6 +119,22 @@ pte_to_sp_meta(pte_t pte)
     return pa_to_sp_meta(pa);
 }
 
+static inline struct pcache_set *
+sp_meta_to_pcache_set(struct pcache_meta *pcm)
+{
+	unsigned long offset;
+
+	offset = pcm - pcache_meta_map;
+	if(offset >= nr_cachelines){
+        return sp_set_map;
+    }
+    else{
+        return NULL:
+    }
+	
+}
+
+
 unsigned long virt_sp_alloc(unsigned long len);
 int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address, 
             unsigned long old_virt_address, unsigned long len);

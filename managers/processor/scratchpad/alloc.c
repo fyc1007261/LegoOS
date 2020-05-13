@@ -166,8 +166,8 @@ int build_new_mapping_one_page(struct mm_struct *mm,
     
     pte_t entry;
     entry = sp_mk_pte(new_pcm, PAGE_SHARED_EXEC);
+    pr_info("Continue0: build_new_mapping_one_page");
     
-    page_table = pte_offset_lock(mm, new_pmd, new_virt_address, &ptl);
     pr_info("Continue1: build_new_mapping_one_page");
     /* data are in pcache: local*/
     if (likely(pte_present(*old_pte))){
@@ -192,28 +192,31 @@ int build_new_mapping_one_page(struct mm_struct *mm,
     
     pte_set(new_pte, entry);
     /* TODO: add rmap information */
-    ret = sp_add_rmap(new_pcm, page_table, old_virt_address,
+    ret = sp_add_rmap(new_pcm, new_pte, old_virt_address,
 			      mm, current->group_leader, RMAP_SP_COPY);
     if (unlikely(ret)) {
+        pr_info("Continue5: build_new_mapping_one_page");
 		pte_clear(page_table);
 		ret = VM_FAULT_OOM;
 		goto out;
 	}
-    pr_info("Continue5: build_new_mapping_one_page");
-    ret = sp_add_rmap(new_pcm, page_table, new_virt_address,
+    pr_info("Continue6: build_new_mapping_one_page");
+    ret = sp_add_rmap(new_pcm, new_pte, new_virt_address,
 			      mm, current->group_leader, RMAP_SP_COPY);
+    pr_info("Continue7: build_new_mapping_one_page");
     if (unlikely(ret)) {
+        pr_info("Continue8: build_new_mapping_one_page");
 		pte_clear(page_table);
 		ret = VM_FAULT_OOM;
 		goto out;
 	}
-    spin_unlock(ptl);
+    
     return 0;
             
 
 out:
     put_pcache(new_pcm);
-    spin_unlock(ptl);
+    
     return ret;
     
 }

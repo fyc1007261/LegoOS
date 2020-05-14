@@ -192,7 +192,9 @@ int build_new_mapping_one_page(struct mm_struct *mm,
         memcpy(new_kva,old_kva,PAGE_SIZE);
         
         char * new_kva_char = (char*)new_kva;
-        pr_info("Continue22: %c", *new_kva_char);
+        pr_info("Continue22 new_kva: %c", *new_kva_char);
+        char * old_kva_char = (char*)old_kva;
+        pr_info("Continue22 old_kva: %c", *old_kva_char);
         
 
     }

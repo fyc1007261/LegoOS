@@ -40,14 +40,17 @@ asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len) {
 asmlinkage long sys_sp_unpin(unsigned long old_addr, unsigned long new_addr, unsigned long len){
 #ifdef CONFIG_COMP_PROCESSOR
     int ret;
+    pr_info("Start: sys_sp_unpin");
     ret = remove_mapping(current->mm,old_addr, new_addr, len);
     if(ret<0){
         return -1;
     }
+    pr_info("Continue1: sys_sp_unpin");
     ret = virt_sp_free(new_addr,len);
     if(ret<0){
         return -1;
     }
+    pr_info("Continue2: sys_sp_unpin");
     return 0;
 #else
     return -1;

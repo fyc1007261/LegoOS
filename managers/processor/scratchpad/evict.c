@@ -22,13 +22,22 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len)
     struct p2m_sp_free_struct payload;
     struct p2m_sp_free_reply_struct retbuf;
     long retlen;
-
-    if (offset_in_page(addr) || addr > TASK_SIZE || len > TASK_SIZE - addr)
-		return -EINVAL;
+    unsigned long offset = offset_in_page(addr);
+    unsigned long prev_len = len;
     len = PAGE_ALIGN(len);
     if(!len){
         return -EINVAL;
     }
+    if(prev_len+offset>len){
+        len=len+PAGE_SIZE;
+    }
+    addr = addr-offset;
+    
+    
+
+    if (offset_in_page(addr) || addr > TASK_SIZE || len > TASK_SIZE - addr)
+		return -EINVAL;
+    
     payload.pid = current->tgid;
     payload.addr = addr;
     payload.len = len;
@@ -178,7 +187,8 @@ static int sp_try_to_unmap_one(struct pcache_meta *pcm,
 
 
 int sp_try_to_unmap(struct pcache_meta *pcm)
-{
+{ 
+    pr_info("Start: sp_try_to_unmap");
     int ret;
 	bool dirty = false;
 	struct rmap_walk_control rwc = {
@@ -200,6 +210,7 @@ int sp_try_to_unmap(struct pcache_meta *pcm)
 int flush_one_page(struct mm_struct *mm, 
             unsigned long new_virt_address, unsigned long old_virt_address)
 {
+    pr_info("Start: flush_one_page");
     pgd_t *new_pgd;
 	pud_t *new_pud;
 	pmd_t *new_pmd;
@@ -227,6 +238,7 @@ int flush_one_page(struct mm_struct *mm,
     new_pte = pte_offset(new_pmd,new_virt_address);
     if (!new_pte)
         return VM_FAULT_OOM;
+    pr_info("Continue1: flush_one_page");
     
     old_pgd = pgd_offset(mm, old_virt_address);
 	old_pud = pud_offset(old_pgd, old_virt_address);
@@ -237,8 +249,10 @@ int flush_one_page(struct mm_struct *mm,
         }
 
     }
+    pr_info("Continue2: flush_one_page");
     /* data are in pcache: local*/
     if (likely(pte_present(*old_pte))){
+        pr_info("Continue3: flush_one_page");
         old_pcm = pte_to_pcache_meta(*old_pte);
         new_pcm = pte_to_sp_meta(*new_pte);
         old_kva = pcache_meta_to_kva(old_pcm);
@@ -247,11 +261,13 @@ int flush_one_page(struct mm_struct *mm,
     }
     /* data are in remote memory */
     else{
+        pr_info("Continue4: flush_one_page");
         ret=sp_flush_one(new_pcm);
         if(ret<0){
             return -1;
         }
     }
+    pr_info("Continue5: flush_one_page");
     ret=sp_try_to_unmap(new_pcm);
     if(ret<0){
         return -1;
@@ -259,20 +275,27 @@ int flush_one_page(struct mm_struct *mm,
 }
 int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_addr, unsigned long len)
 {
-    
+    pr_info("Start: remove_mapping");
+    unsigned long offset = offset_in_page(new_addr);
+    unsigned long prev_len = len;
     len = PAGE_ALIGN(len);
     if (!len){
         return -1;
+    }
+    if(prev_len+offset>len){
+        len = len+PAGE_SIZE;
     }
     struct pcache_meta *pcm;
     unsigned long nr_pcm_free = len / PAGE_SIZE;
     int ret;
     int i;
     for (i=0;i<nr_pcm_free;i++){
+        pr_info("Continue1: remove_mapping");
         ret = flush_one_page(mm,new_addr+i*PAGE_SIZE,old_addr+i*PAGE_SIZE);
         if (ret<0){
             return -1;
         }
+        pr_info("Continue2: remove_mapping");
     }
 
 

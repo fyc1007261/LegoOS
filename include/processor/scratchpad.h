@@ -129,7 +129,7 @@ sp_meta_to_pcache_set(struct pcache_meta *pcm)
         return sp_set_map;
     }
     else{
-        return NULL:
+        return NULL;
     }
 	
 }

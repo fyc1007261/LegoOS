@@ -133,11 +133,6 @@ sp_meta_to_pcache_set(struct pcache_meta *pcm)
     }
 	
 }
-static inline unsigned long sp_meta_to_pfn(struct pcache_meta *pcm)
-{
-	return ((unsigned long)sp_meta_to_pa(pcm)) >> PCACHE_LINE_SIZE_SHIFT;
-}
-
 
 unsigned long virt_sp_alloc(unsigned long offset,unsigned long len);
 int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address, 

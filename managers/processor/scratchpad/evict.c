@@ -109,7 +109,7 @@ __rmap_get_pte_locked(struct pcache_meta *pcm, struct pcache_rmap *rmap,
 		goto out;
 	}
 
-	if (unlikely(pcache_meta_to_pfn(pcm) != pte_pfn(*ptep))) {
+	if (unlikely(sp_meta_to_pfn(pcm) != pte_pfn(*ptep))) {
 		report_bad_rmap(pcm, rmap, address, ptep, caller);
 		ptep = NULL;
 		goto out;
@@ -152,6 +152,7 @@ static inline void __pcache_remove_rmap(struct pcache_meta *pcm,
 static int sp_try_to_unmap_one(struct pcache_meta *pcm,
                     struct pcache_rmap *rmap, void *arg)
 {
+    pr_info("Start: sp_try_to_unmap_one");
     int ret = PCACHE_RMAP_AGAIN;
 	bool *dirty = arg;
 	spinlock_t *ptl = NULL;
@@ -161,6 +162,7 @@ static int sp_try_to_unmap_one(struct pcache_meta *pcm,
 	PCACHE_BUG_ON_RMAP(RmapReserved(rmap), rmap);
     /* we only unmap the new virt addr */
     if (rmap->address>=mmap_base()-(1UL<<30)*128){
+        pr_info("Continue1: sp_try_to_unmap_one");
         pte = rmap_get_pte_locked(pcm, rmap, &ptl);
 	    if (unlikely(!pte))
 		    return ret;
@@ -170,14 +172,16 @@ static int sp_try_to_unmap_one(struct pcache_meta *pcm,
 		    if (pte_dirty(pteval))
 			    *dirty = true;
 
-		
+		    pr_info("Continue2: sp_try_to_unmap_one");
 		    flush_tlb_mm_range(rmap->owner_mm,
 				    rmap->address,
 				    rmap->address + PAGE_SIZE -1);
 	    }
     }
+    pr_info("Continue3: sp_try_to_unmap_one");
 
     __pcache_remove_rmap(pcm, rmap);
+    pr_info("Continue4: sp_try_to_unmap_one");
     if (rmap->address>=mmap_base()-(1UL<<30)*128){
         spin_unlock(ptl);
     }

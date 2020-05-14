@@ -11,7 +11,7 @@
 #define _LEGO_PROCESSOR_PCACHE_SWEEP_H_
 
 #include <processor/pcache_types.h>
-#include <process/scratchpad.h>
+
 
 enum evict_status {
 	PCACHE_EVICT_SUCCEED,

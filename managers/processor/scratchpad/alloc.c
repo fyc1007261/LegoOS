@@ -190,9 +190,9 @@ int build_new_mapping_one_page(struct mm_struct *mm,
         new_kva = sp_meta_to_kva(new_pcm);
         /* copy from kernel virtual address to kernel virtual address*/
         memcpy(new_kva,old_kva,PAGE_SIZE);
-        pr_info("Continue22:");
+        
         char * new_kva_char = (char*)new_kva;
-        pr_info(*new_kva_char);
+        pr_info("Continue22: %c", *new_kva_char);
         
 
     }

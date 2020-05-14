@@ -256,7 +256,7 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
         return -1;
     }
     offset = offset_in_page(old_virt_address);
-    if ((offset+prev)>len){
+    if ((offset+prev_len)>len){
         len+=PAGE_SIZE;
     }
     struct pcache_meta *pcm;

@@ -2375,7 +2375,7 @@ out:
 /* very similar to do_munmap() function; but we don't need to remove page table*/
 int do_sp_free(struct lego_mm_struct *mm, unsigned long start, size_t len)
 {
-
+    pr_info("Start:do_sp_free");
     unsigned long end;
 	struct vm_area_struct *vma, *prev, *last;
 
@@ -2406,6 +2406,7 @@ int do_sp_free(struct lego_mm_struct *mm, unsigned long start, size_t len)
 		prev = vma;
 
 	}
+	pr_info("Continue1:do_sp_free");
     last = find_vma(mm, end);
 	if (last && end > last->vm_start) {
 		int error = __split_vma(mm, last, end, 1);
@@ -2415,7 +2416,7 @@ int do_sp_free(struct lego_mm_struct *mm, unsigned long start, size_t len)
 	vma = prev ? prev->vm_next : mm->mmap;
     detach_vmas_to_be_unmapped(mm, vma, prev, end);
     remove_vma_list(mm, vma);
-
+    pr_info("Continue2:do_sp_free");
     return 0;
 
 

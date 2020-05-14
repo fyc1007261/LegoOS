@@ -19,6 +19,7 @@
 
 unsigned long virt_sp_free(unsigned long addr, unsigned long len)
 {
+    pr_info("Start:virt_sp_free");
     struct p2m_sp_free_struct payload;
     struct p2m_sp_free_reply_struct retbuf;
     long retlen;
@@ -37,14 +38,14 @@ unsigned long virt_sp_free(unsigned long addr, unsigned long len)
 
     if (offset_in_page(addr) || addr > TASK_SIZE || len > TASK_SIZE - addr)
 		return -EINVAL;
-    
+    pr_info("Continue1:virt_sp_free");
     payload.pid = current->tgid;
     payload.addr = addr;
     payload.len = len;
 
-    /*retlen = net_send_reply_timeout(current_memory_home_node(), P2M_SP_FREE,
+    retlen = net_send_reply_timeout(current_memory_home_node(), P2M_SP_FREE,
 			&payload, sizeof(payload), &retbuf, sizeof(retbuf),
-			false, DEF_NET_TIMEOUT);*/
+			false, DEF_NET_TIMEOUT);
     if (unlikely(retlen != sizeof(retbuf))) {
 		retbuf.ret = -EIO;
 		return retbuf.ret;

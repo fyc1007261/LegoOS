@@ -11,11 +11,13 @@
 #include <processor/processor.h>
 #include <processor/scratchpad.h>
 
+
 asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len) {
 #ifdef CONFIG_COMP_PROCESSOR
     /* alloc the virtual memory from m component side */
     pr_info("Start: sys_sp_pin");
-    unsigned long va = virt_sp_alloc(len);
+    unsigned long offset=offset_in_page(addr);
+    unsigned long va = virt_sp_alloc(offset,len);
     if (va<=0){
         return -1;
     }
@@ -28,6 +30,7 @@ asmlinkage long sys_sp_pin(unsigned long addr,unsigned long len) {
         return -1;
     }
     pr_info("Continue2: sys_sp_pin");
+    va = va+offset;
     return va;
 #else
     return -1;

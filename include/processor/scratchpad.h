@@ -135,7 +135,7 @@ sp_meta_to_pcache_set(struct pcache_meta *pcm)
 }
 
 
-unsigned long virt_sp_alloc(unsigned long len);
+unsigned long virt_sp_alloc(unsigned long offset,unsigned long len);
 int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address, 
             unsigned long old_virt_address, unsigned long len);
 int remove_mapping(struct mm_struct *mm, unsigned old_addr, unsigned long new_addr, unsigned long len);

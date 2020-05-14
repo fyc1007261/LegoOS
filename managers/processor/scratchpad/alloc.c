@@ -16,10 +16,11 @@
 #include <processor/distvm.h>
 #include <processor/scratchpad.h>
 
-unsigned long virt_sp_alloc(unsigned long len){
+unsigned long virt_sp_alloc(unsigned long offset,unsigned long len){
     struct p2m_sp_alloc_struct payload;
     struct p2m_sp_alloc_reply_struct reply;
     long ret_len, ret_addr;
+    unsigned long prev_len = len;
     pr_info("Start:virt_sp_alloc");
     
     
@@ -28,6 +29,9 @@ unsigned long virt_sp_alloc(unsigned long len){
 	len = PAGE_ALIGN(len);
 	if (!len)
 		return -ENOMEM;
+    if ((offset+prev_len)>len){
+        len = len+PAGE_SIZE;
+    }
     payload.pid = current->pid;
     payload.len = len;
     ret_len = net_send_reply_timeout(current_memory_home_node(), P2M_SP_ALLOC,
@@ -245,14 +249,21 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
     pr_info("Start: build_new_mapping");
     pr_info("old virt addr: %#llx\n", old_virt_address);
     pr_info("old virt addr: %#llx\n", new_virt_address);
+    unsigned long prev_len = len;
+    unsigned long offset;
     len = PAGE_ALIGN(len);
     if (!len){
         return -1;
+    }
+    offset = offset_in_page(old_virt_address);
+    if ((offset+prev)>len){
+        len+=PAGE_SIZE;
     }
     struct pcache_meta *pcm;
     unsigned long sp_current_used = sp_used();
     int nr_pcm_alloc = len / PAGE_SIZE;
     int ret;
+    
     
     
    
@@ -261,6 +272,7 @@ int build_new_mapping(struct mm_struct *mm, unsigned long new_virt_address,
         return -1;
     }
     int i;
+    
     for (i=0;i<nr_pcm_alloc;i++){
         pr_info("Continue1: build_new_mapping");
         pcm = sp_alloc_one_pcm();

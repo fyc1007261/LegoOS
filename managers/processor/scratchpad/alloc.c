@@ -191,8 +191,9 @@ int build_new_mapping_one_page(struct mm_struct *mm,
         /* copy from kernel virtual address to kernel virtual address*/
         memcpy(new_kva,old_kva,PAGE_SIZE);
         pr_info("Continue22:");
-        pr_info(*(char*)old_kva);
-        pr_info(*(char*)new_kva);
+        char * new_kva_char = (char*)new_kva;
+        pr_info(*new_kva_char);
+        
 
     }
     /* data are in remote memory */

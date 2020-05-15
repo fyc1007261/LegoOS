@@ -95,16 +95,16 @@ int sp_add_rmap(struct pcache_meta *pcm, pte_t *page_table, unsigned long addres
 		BUG_ON(pos->owner_mm == owner_mm);
 		BUG_ON(pos->owner_process == owner_process);
 	}*/
-    pr_info("S1: sp_add_rmap");
+    //pr_info("S1: sp_add_rmap");
 
  add:
-     pr_info("S2: sp_add_rmap");
+    //pr_info("S2: sp_add_rmap");
     ret = 0;
     list_add(&rmap->next, &pcm->rmap);
     atomic_inc(&pcm->mapcount);
 
 out:
-    pr_info("S3: sp_add_rmap");
+    //pr_info("S3: sp_add_rmap");
     unlock_pcache(pcm);
     return ret;
 }

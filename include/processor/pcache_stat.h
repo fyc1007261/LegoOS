@@ -119,6 +119,7 @@ struct pcache_event_stat {
 
 extern struct pcache_event_stat pcache_event_stats;
 extern atomic_long_t nr_used_cachelines;
+extern atomic_long_t sp_nr_used_cachelines;
 
 #ifdef CONFIG_COUNTER_PCACHE
 static inline void inc_pcache_event(enum pcache_event_item item)
